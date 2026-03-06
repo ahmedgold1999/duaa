@@ -787,19 +787,33 @@
         };
 
         async function loadData() {
-            try {
-                const snapshot = await database.ref('devices').once('value');
-                const devices = snapshot.val();
-                devicesData = devices ? Object.values(devices) : [];
-                updateFilters();
-                applyFilters();
-                updateStats();
-                updateCountries();
-                updateChart();
-            } catch (error) {
-                console.error('خطأ:', error);
-            }
+    try {
+        console.log('📥 جاري تحميل البيانات...');
+        const snapshot = await database.ref('devices').once('value');
+        console.log('📦 البيانات الخام:', snapshot.val());
+        
+        const devices = snapshot.val();
+        
+        if (devices) {
+            devicesData = Object.values(devices);
+            console.log('✅ عدد الأجهزة:', devicesData.length);
+            console.log('📱 الأجهزة:', devicesData);
+            updateFilters();
+            applyFilters();
+            updateStats();
+            updateCountries();
+            updateChart();
+        } else {
+            console.log('⚠️ لا توجد بيانات');
+            document.getElementById('devicesTableBody').innerHTML = 
+                '<tr><td colspan="8" class="loading">لا توجد أجهزة مسجلة بعد</td></tr>';
         }
+    } catch (error) {
+        console.error('❌ خطأ في تحميل البيانات:', error);
+        document.getElementById('devicesTableBody').innerHTML = 
+            '<tr><td colspan="8" class="loading" style="color: red;">❌ خطأ: ' + error.message + '</td></tr>';
+    }
+}
 
         function updateFilters() {
             const countries = new Set(devicesData.map(d => d.countryCode).filter(Boolean));
