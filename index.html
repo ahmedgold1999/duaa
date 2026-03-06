@@ -759,6 +759,73 @@
         let filteredDevices = [];
         let chart = null;
 
+        // دالة تحويل رمز الدولة إلى اسم مع العلم
+        function getCountryName(code) {
+            const countries = {
+                'SA': '🇸🇦 السعودية',
+                'AE': '🇦🇪 الإمارات',
+                'KW': '🇰🇼 الكويت',
+                'QA': '🇶🇦 قطر',
+                'BH': '🇧🇭 البحرين',
+                'OM': '🇴🇲 عمان',
+                'EG': '🇪🇬 مصر',
+                'JO': '🇯🇴 الأردن',
+                'LB': '🇱🇧 لبنان',
+                'IQ': '🇮🇶 العراق',
+                'YE': '🇾🇪 اليمن',
+                'PS': '🇵🇸 فلسطين',
+                'SY': '🇸🇾 سوريا',
+                'TN': '🇹🇳 تونس',
+                'DZ': '🇩🇿 الجزائر',
+                'MA': '🇲🇦 المغرب',
+                'LY': '🇱🇾 ليبيا',
+                'SD': '🇸🇩 السودان',
+                'MR': '🇲🇷 موريتانيا',
+                'SO': '🇸🇴 الصومال',
+                'DJ': '🇩🇯 جيبوتي',
+                'KM': '🇰🇲 جزر القمر',
+                'US': '🇺🇸 الولايات المتحدة',
+                'GB': '🇬🇧 بريطانيا',
+                'CA': '🇨🇦 كندا',
+                'AU': '🇦🇺 أستراليا',
+                'DE': '🇩🇪 ألمانيا',
+                'FR': '🇫🇷 فرنسا',
+                'TR': '🇹🇷 تركيا',
+                'IN': '🇮🇳 الهند',
+                'PK': '🇵🇰 باكستان',
+                'BD': '🇧🇩 بنغلاديش',
+                'ID': '🇮🇩 إندونيسيا',
+                'MY': '🇲🇾 ماليزيا',
+                'CN': '🇨🇳 الصين',
+                'JP': '🇯🇵 اليابان',
+                'KR': '🇰🇷 كوريا الجنوبية',
+                'RU': '🇷🇺 روسيا',
+                'BR': '🇧🇷 البرازيل',
+                'AR': '🇦🇷 الأرجنتين',
+                'ZA': '🇿🇦 جنوب أفريقيا',
+                'NG': '🇳🇬 نيجيريا',
+                'KE': '🇰🇪 كينيا',
+                'ES': '🇪🇸 إسبانيا',
+                'IT': '🇮🇹 إيطاليا',
+                'NL': '🇳🇱 هولندا',
+                'BE': '🇧🇪 بلجيكا',
+                'CH': '🇨🇭 سويسرا',
+                'AT': '🇦🇹 النمسا',
+                'SE': '🇸🇪 السويد',
+                'NO': '🇳🇴 النرويج',
+                'DK': '🇩🇰 الدنمارك',
+                'FI': '🇫🇮 فنلندا',
+                'PL': '🇵🇱 بولندا',
+                'CZ': '🇨🇿 التشيك',
+                'HU': '🇭🇺 المجر',
+                'GR': '🇬🇷 اليونان',
+                'PT': '🇵🇹 البرتغال',
+                'IE': '🇮🇪 أيرلندا',
+                'NZ': '🇳🇿 نيوزيلندا'
+            };
+            return countries[code] || code || '-';
+        }
+
         // التحقق من حالة تسجيل الدخول
         auth.onAuthStateChanged((user) => {
             if (user) {
@@ -843,11 +910,11 @@
             const countries = new Set(devicesData.map(d => d.countryCode).filter(Boolean));
             const versions = new Set(devicesData.map(d => d.appVersion).filter(Boolean));
             
-            let countryHtml = '<option value="all">جميع الدول</option>';
-            countries.forEach(c => countryHtml += `<option value="${c}">${c}</option>`);
+            let countryHtml = '<option value="all">🌍 جميع الدول</option>';
+            countries.forEach(c => countryHtml += `<option value="${c}">${getCountryName(c)}</option>`);
             countryFilter.innerHTML = countryHtml;
             
-            let versionHtml = '<option value="all">جميع الإصدارات</option>';
+            let versionHtml = '<option value="all">📱 جميع الإصدارات</option>';
             versions.forEach(v => versionHtml += `<option value="${v}">الإصدار ${v}</option>`);
             versionFilter.innerHTML = versionHtml;
         }
@@ -879,7 +946,7 @@
             totalOpens.textContent = opens;
         }
 
-        // تحديث الجدول
+        // تحديث الجدول مع عرض أسماء الدول
         function updateTable() {
             if (filteredDevices.length === 0) {
                 devicesTableBody.innerHTML = '<tr><td colspan="8" class="loading">لا توجد أجهزة مطابقة</td></tr>';
@@ -898,7 +965,7 @@
                         <td>${index + 1}</td>
                         <td>${device.deviceBrand || '-'}</td>
                         <td>${device.deviceModel || '-'}</td>
-                        <td><span class="badge">${device.countryCode || '-'}</span></td>
+                        <td><span class="badge">${getCountryName(device.countryCode)}</span></td>
                         <td>${firstOpen}</td>
                         <td>${lastOpen}</td>
                         <td><span class="badge">${device.openCount || 0}</span></td>
@@ -910,12 +977,13 @@
             devicesTableBody.innerHTML = html;
         }
 
-        // تحديث الدول
+        // تحديث الدول مع أسماء الدول
         function updateCountries() {
             const countriesMap = new Map();
             filteredDevices.forEach(device => {
                 if (device.countryCode) {
-                    countriesMap.set(device.countryCode, (countriesMap.get(device.countryCode) || 0) + 1);
+                    const countryName = getCountryName(device.countryCode);
+                    countriesMap.set(countryName, (countriesMap.get(countryName) || 0) + 1);
                 }
             });
 
