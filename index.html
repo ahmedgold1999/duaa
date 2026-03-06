@@ -12,6 +12,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"></script>
     <style>
         * {
             margin: 0;
@@ -26,265 +27,258 @@
             padding: 20px;
         }
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .header {
+        /* شاشة تسجيل الدخول */
+        .login-container {
+            max-width: 400px;
+            margin: 50px auto;
             background: white;
             border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .login-header {
             text-align: center;
-        }
-
-        .header h1 {
-            color: #2c3e50;
-            margin-bottom: 10px;
-            font-size: 2.5em;
-        }
-
-        .header p {
-            color: #7f8c8d;
-            font-size: 1.1em;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
             margin-bottom: 30px;
         }
 
-        .stat-card {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            transition: transform 0.3s;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .stat-card i {
-            font-size: 3em;
+        .login-header i {
+            font-size: 4em;
             color: #667eea;
+            margin-bottom: 15px;
         }
 
-        .stat-info {
-            display: flex;
-            flex-direction: column;
+        .login-header h2 {
+            color: #2c3e50;
+            font-size: 1.8em;
         }
 
-        .stat-label {
+        .login-header p {
             color: #7f8c8d;
-            font-size: 0.9em;
+            margin-top: 10px;
         }
 
-        .stat-value {
-            font-size: 2em;
-            font-weight: bold;
-            color: #2c3e50;
-        }
-
-        .chart-container {
-            background: white;
-            border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 30px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        .chart-container h2 {
-            color: #2c3e50;
+        .input-group {
             margin-bottom: 20px;
         }
 
-        .devices-section {
-            background: white;
-            border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 30px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        .devices-section h2 {
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
             color: #2c3e50;
-            margin-bottom: 20px;
-        }
-
-        .table-container {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th {
-            background: #667eea;
-            color: white;
-            padding: 12px;
             font-weight: 600;
         }
 
-        td {
-            padding: 12px;
-            border-bottom: 1px solid #e0e0e0;
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .error-message {
+            color: #e74c3c;
             text-align: center;
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            background: #fde8e7;
+            display: none;
         }
 
-        tr:hover {
-            background: #f5f5f5;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 30px;
-            color: #7f8c8d;
-        }
-
-        .countries-section {
-            background: white;
+        .logout-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 20px;
             border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 30px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            cursor: pointer;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.3s;
         }
 
-        .countries-section h2 {
-            color: #2c3e50;
-            margin-bottom: 20px;
+        .logout-btn:hover {
+            background: #c0392b;
         }
 
-        .countries-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        .user-info {
+            display: flex;
+            align-items: center;
             gap: 15px;
         }
 
-        .country-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
+        .user-email {
+            color: #2c3e50;
+            font-size: 0.9em;
         }
 
-        .country-name {
-            font-size: 1.2em;
-            font-weight: bold;
-            margin-bottom: 5px;
+        .hidden {
+            display: none !important;
         }
 
-        .country-count {
-            font-size: 1.5em;
-            font-weight: bold;
+        .main-content {
+            display: none;
         }
 
-        .badge {
-            background: #27ae60;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 0.8em;
+        .main-content.visible {
+            display: block;
         }
 
-        .version-badge {
-            background: #3498db;
-            color: white;
-            padding: 3px 8px;
-            border-radius: 15px;
-            font-size: 0.8em;
+        .login-container.hidden {
+            display: none;
+        }
+
+        .header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>📊 لوحة تحكم التطبيق - أدعية يومية</h1>
-            <p>إحصائيات وتفاصيل المستخدمين</p>
+    <!-- شاشة تسجيل الدخول -->
+    <div id="loginContainer" class="login-container">
+        <div class="login-header">
+            <i class="fas fa-mosque"></i>
+            <h2>لوحة تحكم أدعية يومية</h2>
+            <p>تسجيل الدخول للمشرفين فقط</p>
         </div>
+        
+        <form id="loginForm">
+            <div class="input-group">
+                <label><i class="fas fa-envelope"></i> البريد الإلكتروني</label>
+                <input type="email" id="email" placeholder="admin@example.com" required>
+            </div>
+            
+            <div class="input-group">
+                <label><i class="fas fa-lock"></i> كلمة المرور</label>
+                <input type="password" id="password" placeholder="********" required>
+            </div>
+            
+            <button type="submit" class="login-btn">
+                <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
+            </button>
+            
+            <div id="errorMessage" class="error-message"></div>
+        </form>
+    </div>
 
-        <div class="stats-grid">
-            <div class="stat-card">
-                <i class="fas fa-users"></i>
-                <div class="stat-info">
-                    <span class="stat-label">إجمالي المستخدمين</span>
-                    <span class="stat-value" id="totalUsers">0</span>
+    <!-- المحتوى الرئيسي (يظهر بعد تسجيل الدخول) -->
+    <div id="mainContent" class="main-content">
+        <div class="container">
+            <div class="header">
+                <div class="header-actions">
+                    <div>
+                        <h1>📊 لوحة تحكم التطبيق - أدعية يومية</h1>
+                        <p>إحصائيات وتفاصيل المستخدمين</p>
+                    </div>
+                    <div class="user-info">
+                        <span class="user-email" id="userEmail"></span>
+                        <button class="logout-btn" onclick="logout()">
+                            <i class="fas fa-sign-out-alt"></i> تسجيل خروج
+                        </button>
+                    </div>
                 </div>
             </div>
-            <div class="stat-card">
-                <i class="fas fa-mobile-alt"></i>
-                <div class="stat-info">
-                    <span class="stat-label">الأجهزة النشطة اليوم</span>
-                    <span class="stat-value" id="activeToday">0</span>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <i class="fas fa-users"></i>
+                    <div class="stat-info">
+                        <span class="stat-label">إجمالي المستخدمين</span>
+                        <span class="stat-value" id="totalUsers">0</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-mobile-alt"></i>
+                    <div class="stat-info">
+                        <span class="stat-label">الأجهزة النشطة اليوم</span>
+                        <span class="stat-value" id="activeToday">0</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-globe"></i>
+                    <div class="stat-info">
+                        <span class="stat-label">الدول المتاحة</span>
+                        <span class="stat-value" id="totalCountries">0</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-chart-line"></i>
+                    <div class="stat-info">
+                        <span class="stat-label">إجمالي الفتحات</span>
+                        <span class="stat-value" id="totalOpens">0</span>
+                    </div>
                 </div>
             </div>
-            <div class="stat-card">
-                <i class="fas fa-globe"></i>
-                <div class="stat-info">
-                    <span class="stat-label">الدول المتاحة</span>
-                    <span class="stat-value" id="totalCountries">0</span>
+
+            <div class="chart-container">
+                <h2>📈 نمو المستخدمين</h2>
+                <canvas id="usersChart"></canvas>
+            </div>
+
+            <div class="devices-section">
+                <h2>📱 قائمة الأجهزة المسجلة</h2>
+                <div class="table-container">
+                    <table id="devicesTable">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>نوع الجهاز</th>
+                                <th>الموديل</th>
+                                <th>الدولة</th>
+                                <th>أول فتح</th>
+                                <th>آخر فتح</th>
+                                <th>عدد الفتحات</th>
+                                <th>الإصدار</th>
+                            </tr>
+                        </thead>
+                        <tbody id="devicesTableBody">
+                            <tr>
+                                <td colspan="8" class="loading">جاري تحميل البيانات...</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-            <div class="stat-card">
-                <i class="fas fa-chart-line"></i>
-                <div class="stat-info">
-                    <span class="stat-label">إجمالي الفتحات</span>
-                    <span class="stat-value" id="totalOpens">0</span>
-                </div>
-            </div>
-        </div>
 
-        <div class="chart-container">
-            <h2>📈 نمو المستخدمين</h2>
-            <canvas id="usersChart"></canvas>
-        </div>
-
-        <div class="devices-section">
-            <h2>📱 قائمة الأجهزة المسجلة</h2>
-            <div class="table-container">
-                <table id="devicesTable">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>نوع الجهاز</th>
-                            <th>الموديل</th>
-                            <th>الدولة</th>
-                            <th>أول فتح</th>
-                            <th>آخر فتح</th>
-                            <th>عدد الفتحات</th>
-                            <th>الإصدار</th>
-                        </tr>
-                    </thead>
-                    <tbody id="devicesTableBody">
-                        <tr>
-                            <td colspan="8" class="loading">جاري تحميل البيانات...</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div class="countries-section">
-            <h2>🌍 توزيع المستخدمين حسب الدولة</h2>
-            <div class="countries-grid" id="countriesGrid">
-                <!-- ستضاف الدول هنا -->
+            <div class="countries-section">
+                <h2>🌍 توزيع المستخدمين حسب الدولة</h2>
+                <div class="countries-grid" id="countriesGrid"></div>
             </div>
         </div>
     </div>
 
     <script>
-        // 🔥 استبدل هذه المعلومات بمعلومات مشروعك من Firebase Console
+        // ✅ تكوين Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyAfn5JGHZKW3Gje0nKmUZ4GnTzX00iWsY4",
             authDomain: "daily-duas-app.firebaseapp.com",
@@ -299,10 +293,87 @@
         // تهيئة Firebase
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
+        const analytics = firebase.analytics();
+        const auth = firebase.auth();
+
+        // عناصر الصفحة
+        const loginContainer = document.getElementById('loginContainer');
+        const mainContent = document.getElementById('mainContent');
+        const loginForm = document.getElementById('loginForm');
+        const errorMessage = document.getElementById('errorMessage');
+        const userEmailSpan = document.getElementById('userEmail');
 
         // المتغيرات العامة
         let devicesData = [];
         let chart = null;
+
+        // التحقق من حالة تسجيل الدخول
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                // مستخدم مسجل الدخول
+                loginContainer.classList.add('hidden');
+                mainContent.classList.add('visible');
+                userEmailSpan.textContent = user.email;
+                loadData(); // تحميل البيانات
+                
+                // تسجيل حدث في Analytics
+                analytics.logEvent({
+                    name: 'admin_login',
+                    params: { email: user.email }
+                });
+            } else {
+                // لا يوجد مستخدم - عرض شاشة تسجيل الدخول
+                loginContainer.classList.remove('hidden');
+                mainContent.classList.remove('visible');
+            }
+        });
+
+        // معالجة تسجيل الدخول
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            // إخفاء أي رسالة خطأ سابقة
+            errorMessage.style.display = 'none';
+            
+            try {
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                console.log('✅ تم تسجيل الدخول بنجاح:', userCredential.user.email);
+            } catch (error) {
+                console.error('❌ خطأ في تسجيل الدخول:', error);
+                
+                let message = 'حدث خطأ في تسجيل الدخول';
+                switch (error.code) {
+                    case 'auth/invalid-email':
+                        message = 'البريد الإلكتروني غير صالح';
+                        break;
+                    case 'auth/user-disabled':
+                        message = 'هذا الحساب معطل';
+                        break;
+                    case 'auth/user-not-found':
+                        message = 'لا يوجد حساب بهذا البريد';
+                        break;
+                    case 'auth/wrong-password':
+                        message = 'كلمة المرور غير صحيحة';
+                        break;
+                }
+                
+                errorMessage.textContent = message;
+                errorMessage.style.display = 'block';
+            }
+        });
+
+        // دالة تسجيل الخروج
+        window.logout = async function() {
+            try {
+                await auth.signOut();
+                console.log('✅ تم تسجيل الخروج');
+            } catch (error) {
+                console.error('❌ خطأ في تسجيل الخروج:', error);
+            }
+        };
 
         // تحميل البيانات
         async function loadData() {
@@ -412,7 +483,6 @@
         function updateChart() {
             const ctx = document.getElementById('usersChart').getContext('2d');
             
-            // تجميع المستخدمين حسب تاريخ التسجيل
             const registrations = {};
             devicesData.forEach(device => {
                 if (device.firstOpenDate) {
@@ -450,27 +520,24 @@
                 options: {
                     responsive: true,
                     plugins: {
-                        legend: {
-                            display: false
-                        }
+                        legend: { display: false }
                     },
                     scales: {
                         y: {
                             beginAtZero: true,
-                            ticks: {
-                                stepSize: 1
-                            }
+                            ticks: { stepSize: 1 }
                         }
                     }
                 }
             });
         }
 
-        // تحميل البيانات عند فتح الصفحة
-        window.addEventListener('load', loadData);
-
         // تحديث كل 30 ثانية
-        setInterval(loadData, 30000);
+        setInterval(() => {
+            if (auth.currentUser) {
+                loadData();
+            }
+        }, 30000);
     </script>
 </body>
 </html>
