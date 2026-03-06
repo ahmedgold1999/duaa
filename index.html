@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- Chart.js للرسوم البيانية -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Firebase SDK (الإصدار الثامن - الأقدم والأكثر توافقاً) -->
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-analytics.js"></script>
@@ -18,125 +18,546 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Tajawal', 'Segoe UI', sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(145deg, #1a2639 0%, #2c3e50 100%);
             min-height: 100vh;
-            padding: 20px;
+            padding: 25px;
+            position: relative;
+            overflow-x: hidden;
         }
 
-        /* شاشة تسجيل الدخول */
+        /* خلفية متحركة */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.05"><path d="M50 0 L100 50 L50 100 L0 50 Z" fill="white"/></svg>');
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* شاشة تسجيل الدخول الفاخرة */
         .login-container {
-            max-width: 400px;
-            margin: 50px auto;
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            max-width: 450px;
+            margin: 80px auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 40px;
+            padding: 50px 45px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3), 0 0 0 2px rgba(255, 215, 0, 0.2) inset;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,215,0,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
         .login-header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
+            position: relative;
         }
 
         .login-header i {
-            font-size: 4em;
-            color: #667eea;
-            margin-bottom: 15px;
+            font-size: 5em;
+            background: linear-gradient(145deg, #c5a028, #ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 10px 15px rgba(255,215,0,0.3));
         }
 
         .login-header h2 {
-            color: #2c3e50;
-            font-size: 1.8em;
+            color: #1a2639;
+            font-size: 2.2em;
+            font-weight: 800;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
         }
 
         .login-header p {
-            color: #7f8c8d;
-            margin-top: 10px;
+            color: #5a6b7c;
+            font-size: 1.1em;
         }
 
         .input-group {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            position: relative;
         }
 
         .input-group label {
             display: block;
-            margin-bottom: 8px;
-            color: #2c3e50;
+            margin-bottom: 10px;
+            color: #1a2639;
             font-weight: 600;
+            font-size: 1em;
+        }
+
+        .input-group label i {
+            color: #ffd700;
+            margin-left: 8px;
         }
 
         .input-group input {
             width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #e0e7ff;
+            border-radius: 15px;
             font-size: 1em;
-            transition: border-color 0.3s;
+            transition: all 0.3s;
+            color: #1a2639;
+            font-weight: 500;
         }
 
         .input-group input:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #ffd700;
+            box-shadow: 0 0 0 4px rgba(255,215,0,0.2);
+            transform: translateY(-2px);
         }
 
         .login-btn {
             width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            padding: 16px;
+            background: linear-gradient(145deg, #ffd700, #c5a028);
+            color: #1a2639;
             border: none;
-            border-radius: 10px;
-            font-size: 1.1em;
-            font-weight: 600;
+            border-radius: 15px;
+            font-size: 1.2em;
+            font-weight: 800;
             cursor: pointer;
-            transition: transform 0.3s;
+            transition: all 0.3s;
+            box-shadow: 0 10px 20px rgba(255,215,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s;
+        }
+
+        .login-btn:hover::before {
+            left: 100%;
         }
 
         .login-btn:hover {
-            transform: translateY(-2px);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(255,215,0,0.4);
         }
 
-        .error-message {
-            color: #e74c3c;
-            text-align: center;
-            margin-top: 15px;
-            padding: 10px;
-            border-radius: 5px;
-            background: #fde8e7;
-            display: none;
+        /* الهيدر الرئيسي */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,215,0,0.3);
+            position: relative;
+            overflow: hidden;
         }
 
-        .logout-btn {
-            background: #e74c3c;
-            color: white;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.9em;
+        .header::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #ffd700, #c5a028, #ffd700);
+        }
+
+        .header h1 {
+            color: #1a2639;
+            font-size: 2.2em;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #5a6b7c;
+            font-size: 1.1em;
+        }
+
+        .header-actions {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 8px;
-            transition: background 0.3s;
-        }
-
-        .logout-btn:hover {
-            background: #c0392b;
         }
 
         .user-info {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 20px;
+            background: linear-gradient(145deg, #f8fafc, #eef2f6);
+            padding: 12px 25px;
+            border-radius: 50px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
 
         .user-email {
-            color: #2c3e50;
-            font-size: 0.9em;
+            color: #1a2639;
+            font-weight: 600;
+            font-size: 1em;
+        }
+
+        .logout-btn {
+            background: linear-gradient(145deg, #ff4757, #ee3a4a);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(255,71,87,0.3);
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255,71,87,0.4);
+        }
+
+        /* بطاقات الإحصائيات الفاخرة */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            padding: 30px;
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            transition: all 0.4s;
+            border: 1px solid rgba(255,215,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(255,215,0,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            border-color: rgba(255,215,0,0.5);
+        }
+
+        .stat-card i {
+            font-size: 3.5em;
+            background: linear-gradient(145deg, #ffd700, #c5a028);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 5px 10px rgba(255,215,0,0.3));
+        }
+
+        .stat-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-label {
+            color: #5a6b7c;
+            font-size: 1em;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 2.8em;
+            font-weight: 800;
+            background: linear-gradient(145deg, #1a2639, #2c3e50);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+        }
+
+        /* حاوية الرسم البياني */
+        .chart-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,215,0,0.2);
+        }
+
+        .chart-container h2 {
+            color: #1a2639;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* قسم الأجهزة */
+        .devices-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,215,0,0.2);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .section-header h2 {
+            color: #1a2639;
+            font-size: 1.8em;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filters {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 12px 25px;
+            background: white;
+            border: 2px solid #e0e7ff;
+            border-radius: 15px;
+            font-size: 0.95em;
+            color: #1a2639;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 150px;
+        }
+
+        .filter-select:hover {
+            border-color: #ffd700;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #ffd700;
+            box-shadow: 0 0 0 4px rgba(255,215,0,0.2);
+        }
+
+        .search-input {
+            padding: 12px 25px;
+            background: white;
+            border: 2px solid #e0e7ff;
+            border-radius: 15px;
+            font-size: 0.95em;
+            color: #1a2639;
+            min-width: 200px;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #ffd700;
+            box-shadow: 0 0 0 4px rgba(255,215,0,0.2);
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.5);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 8px;
+        }
+
+        th {
+            background: linear-gradient(145deg, #1a2639, #2c3e50);
+            color: white;
+            padding: 18px 12px;
+            font-weight: 600;
+            font-size: 0.95em;
+            text-align: center;
+        }
+
+        th:first-child {
+            border-radius: 15px 0 0 15px;
+        }
+
+        th:last-child {
+            border-radius: 0 15px 15px 0;
+        }
+
+        td {
+            padding: 15px 12px;
+            background: white;
+            border-bottom: 2px solid #f1f5f9;
+            text-align: center;
+            color: #334155;
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+
+        tr:hover td {
+            background: linear-gradient(145deg, #fff, #f8fafc);
+            transform: scale(1.01);
+            transition: all 0.3s;
+        }
+
+        .badge {
+            background: linear-gradient(145deg, #10b981, #059669);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 30px;
+            font-size: 0.85em;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .version-badge {
+            background: linear-gradient(145deg, #3b82f6, #2563eb);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 30px;
+            font-size: 0.85em;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        /* قسم الدول */
+        .countries-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,215,0,0.2);
+        }
+
+        .countries-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .country-card {
+            background: linear-gradient(145deg, #1a2639, #2c3e50);
+            color: white;
+            padding: 20px;
+            border-radius: 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s;
+            border: 1px solid rgba(255,215,0,0.3);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .country-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,215,0,0.2) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        .country-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 20px 30px rgba(0,0,0,0.3);
+            border-color: #ffd700;
+        }
+
+        .country-name {
+            font-size: 1.3em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .country-count {
+            font-size: 2.2em;
+            font-weight: 800;
+            color: #ffd700;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #5a6b7c;
+            font-size: 1.2em;
         }
 
         .hidden {
@@ -155,134 +576,53 @@
             display: none;
         }
 
-        /* أضف هذا في نهاية قسم <style> */
-.stat-card {
-    background: white;
-    border-radius: 15px;
-    padding: 25px;
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    transition: transform 0.3s;
-}
+        /* شريط التقدم */
+        .progress-bar {
+            height: 8px;
+            background: linear-gradient(90deg, #ffd700, #c5a028);
+            border-radius: 4px;
+            margin: 20px 0;
+            animation: progress 2s ease-in-out infinite;
+        }
 
-.stat-card:hover {
-    transform: translateY(-5px);
-}
-
-.stat-card i {
-    font-size: 3em;
-    color: #667eea;
-}
-
-.stat-info {
-    display: flex;
-    flex-direction: column;
-}
-
-.stat-label {
-    color: #7f8c8d;
-    font-size: 0.9em;
-}
-
-.stat-value {
-    font-size: 2em;
-    font-weight: bold;
-    color: #2c3e50;
-}
-
-.chart-container {
-    background: white;
-    border-radius: 20px;
-    padding: 25px;
-    margin-bottom: 30px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-}
-
-.devices-section {
-    background: white;
-    border-radius: 20px;
-    padding: 25px;
-    margin-bottom: 30px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-}
-
-.table-container {
-    overflow-x: auto;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-th {
-    background: #667eea;
-    color: white;
-    padding: 12px;
-    font-weight: 600;
-}
-
-td {
-    padding: 12px;
-    border-bottom: 1px solid #e0e0e0;
-    text-align: center;
-}
-
-.countries-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 15px;
-}
-
-.country-card {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 15px;
-    border-radius: 10px;
-    text-align: center;
-}
-
-        .header-actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
+        @keyframes progress {
+            0% { width: 0%; opacity: 0.5; }
+            50% { width: 100%; opacity: 1; }
+            100% { width: 0%; opacity: 0.5; }
         }
     </style>
 </head>
 <body>
-    <!-- شاشة تسجيل الدخول -->
-    <div id="loginContainer" class="login-container">
-        <div class="login-header">
-            <i class="fas fa-mosque"></i>
-            <h2>لوحة تحكم أدعية يومية</h2>
-            <p>تسجيل الدخول للمشرفين فقط</p>
+    <div class="container">
+        <!-- شاشة تسجيل الدخول -->
+        <div id="loginContainer" class="login-container">
+            <div class="login-header">
+                <i class="fas fa-mosque"></i>
+                <h2>لوحة تحكم أدعية يومية</h2>
+                <p>تسجيل الدخول للمشرفين فقط</p>
+            </div>
+            
+            <form id="loginForm">
+                <div class="input-group">
+                    <label><i class="fas fa-envelope"></i> البريد الإلكتروني</label>
+                    <input type="email" id="email" placeholder="admin@example.com" required>
+                </div>
+                
+                <div class="input-group">
+                    <label><i class="fas fa-lock"></i> كلمة المرور</label>
+                    <input type="password" id="password" placeholder="********" required>
+                </div>
+                
+                <button type="submit" class="login-btn">
+                    <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
+                </button>
+                
+                <div id="errorMessage" class="error-message"></div>
+            </form>
         </div>
-        
-        <form id="loginForm">
-            <div class="input-group">
-                <label><i class="fas fa-envelope"></i> البريد الإلكتروني</label>
-                <input type="email" id="email" placeholder="admin@example.com" required>
-            </div>
-            
-            <div class="input-group">
-                <label><i class="fas fa-lock"></i> كلمة المرور</label>
-                <input type="password" id="password" placeholder="********" required>
-            </div>
-            
-            <button type="submit" class="login-btn">
-                <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
-            </button>
-            
-            <div id="errorMessage" class="error-message"></div>
-        </form>
-    </div>
 
-    <!-- المحتوى الرئيسي (يظهر بعد تسجيل الدخول) -->
-    <div id="mainContent" class="main-content">
-        <div class="container">
+        <!-- المحتوى الرئيسي -->
+        <div id="mainContent" class="main-content">
             <div class="header">
                 <div class="header-actions">
                     <div>
@@ -296,6 +636,7 @@ td {
                         </button>
                     </div>
                 </div>
+                <div class="progress-bar"></div>
             </div>
 
             <div class="stats-grid">
@@ -330,18 +671,29 @@ td {
             </div>
 
             <div class="chart-container">
-                <h2>📈 نمو المستخدمين</h2>
+                <h2><i class="fas fa-chart-line" style="color: #ffd700;"></i> نمو المستخدمين</h2>
                 <canvas id="usersChart"></canvas>
             </div>
 
             <div class="devices-section">
-                <h2>📱 قائمة الأجهزة المسجلة</h2>
+                <div class="section-header">
+                    <h2><i class="fas fa-table" style="color: #ffd700;"></i> قائمة الأجهزة المسجلة</h2>
+                    <div class="filters">
+                        <select id="countryFilter" class="filter-select">
+                            <option value="all">جميع الدول</option>
+                        </select>
+                        <select id="versionFilter" class="filter-select">
+                            <option value="all">جميع الإصدارات</option>
+                        </select>
+                        <input type="text" id="searchDevice" class="search-input" placeholder="🔍 بحث في الأجهزة...">
+                    </div>
+                </div>
                 <div class="table-container">
                     <table id="devicesTable">
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>نوع الجهاز</th>
+                                <th>العلامة التجارية</th>
                                 <th>الموديل</th>
                                 <th>الدولة</th>
                                 <th>أول فتح</th>
@@ -360,14 +712,13 @@ td {
             </div>
 
             <div class="countries-section">
-                <h2>🌍 توزيع المستخدمين حسب الدولة</h2>
+                <h2><i class="fas fa-globe-asia" style="color: #ffd700;"></i> توزيع المستخدمين حسب الدولة</h2>
                 <div class="countries-grid" id="countriesGrid"></div>
             </div>
         </div>
     </div>
 
     <script>
-        // ✅ تكوين Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyAfn5JGHZKW3Gje0nKmUZ4GnTzX00iWsY4",
             authDomain: "daily-duas-app.firebaseapp.com",
@@ -379,120 +730,108 @@ td {
             measurementId: "G-N2CT1HLTM2"
         };
 
-        // تهيئة Firebase (طريقة SDK 8)
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         const analytics = firebase.analytics();
         const auth = firebase.auth();
 
-        // عناصر الصفحة
         const loginContainer = document.getElementById('loginContainer');
         const mainContent = document.getElementById('mainContent');
         const loginForm = document.getElementById('loginForm');
         const errorMessage = document.getElementById('errorMessage');
         const userEmailSpan = document.getElementById('userEmail');
+        const countryFilter = document.getElementById('countryFilter');
+        const versionFilter = document.getElementById('versionFilter');
+        const searchDevice = document.getElementById('searchDevice');
 
-        // المتغيرات العامة
         let devicesData = [];
         let chart = null;
+        let filteredDevices = [];
 
-        // التحقق من حالة تسجيل الدخول
         auth.onAuthStateChanged((user) => {
-            console.log('👤 حالة المستخدم:', user ? 'مسجل دخول' : 'غير مسجل');
-            
             if (user) {
-                console.log('✅ مستخدم:', user.email);
                 loginContainer.classList.add('hidden');
                 mainContent.classList.add('visible');
                 userEmailSpan.textContent = user.email;
                 loadData();
-                
-                analytics.logEvent('admin_login', {
-                    email: user.email
-                });
+                analytics.logEvent('admin_login', { email: user.email });
             } else {
-                console.log('🔴 لا يوجد مستخدم');
                 loginContainer.classList.remove('hidden');
                 mainContent.classList.remove('visible');
             }
         });
 
-        // معالجة تسجيل الدخول
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             
             errorMessage.style.display = 'none';
             
             try {
-                const userCredential = await auth.signInWithEmailAndPassword(email, password);
-                console.log('✅ تم تسجيل الدخول بنجاح:', userCredential.user.email);
+                await auth.signInWithEmailAndPassword(email, password);
             } catch (error) {
-                console.error('❌ خطأ في تسجيل الدخول:', error);
-                
                 let message = 'حدث خطأ في تسجيل الدخول';
                 switch (error.code) {
-                    case 'auth/invalid-email':
-                        message = 'البريد الإلكتروني غير صالح';
-                        break;
-                    case 'auth/user-disabled':
-                        message = 'هذا الحساب معطل';
-                        break;
-                    case 'auth/user-not-found':
-                        message = 'لا يوجد حساب بهذا البريد';
-                        break;
-                    case 'auth/wrong-password':
-                        message = 'كلمة المرور غير صحيحة';
-                        break;
+                    case 'auth/invalid-email': message = 'البريد الإلكتروني غير صالح'; break;
+                    case 'auth/user-not-found': message = 'لا يوجد حساب بهذا البريد'; break;
+                    case 'auth/wrong-password': message = 'كلمة المرور غير صحيحة'; break;
                 }
-                
                 errorMessage.textContent = message;
                 errorMessage.style.display = 'block';
             }
         });
 
-        // دالة تسجيل الخروج
         window.logout = async function() {
-            try {
-                await auth.signOut();
-                console.log('✅ تم تسجيل الخروج');
-            } catch (error) {
-                console.error('❌ خطأ في تسجيل الخروج:', error);
-            }
+            await auth.signOut();
         };
 
-        // تحميل البيانات
         async function loadData() {
             try {
                 const snapshot = await database.ref('devices').once('value');
                 const devices = snapshot.val();
-                
-                if (devices) {
-                    devicesData = Object.values(devices);
-                    updateStats();
-                    updateTable();
-                    updateCountries();
-                    updateChart();
-                }
+                devicesData = devices ? Object.values(devices) : [];
+                updateFilters();
+                applyFilters();
+                updateStats();
+                updateCountries();
+                updateChart();
             } catch (error) {
-                console.error('خطأ في تحميل البيانات:', error);
-                document.getElementById('devicesTableBody').innerHTML = 
-                    '<tr><td colspan="8" class="loading" style="color: red;">❌ فشل تحميل البيانات من Firebase</td></tr>';
+                console.error('خطأ:', error);
             }
         }
 
-        // تحديث الإحصائيات
-        function updateStats() {
-            const totalUsers = devicesData.length;
-            const today = new Date().toISOString().split('T')[0];
-            const activeToday = devicesData.filter(d => 
-                d.lastOpenDate && d.lastOpenDate.startsWith(today)
-            ).length;
-            
+        function updateFilters() {
             const countries = new Set(devicesData.map(d => d.countryCode).filter(Boolean));
-            const totalOpens = devicesData.reduce((sum, d) => sum + (d.openCount || 0), 0);
+            const versions = new Set(devicesData.map(d => d.appVersion).filter(Boolean));
+            
+            let countryHtml = '<option value="all">جميع الدول</option>';
+            countries.forEach(c => countryHtml += `<option value="${c}">${c}</option>`);
+            countryFilter.innerHTML = countryHtml;
+            
+            let versionHtml = '<option value="all">جميع الإصدارات</option>';
+            versions.forEach(v => versionHtml += `<option value="${v}">الإصدار ${v}</option>`);
+            versionFilter.innerHTML = versionHtml;
+        }
+
+        function applyFilters() {
+            filteredDevices = devicesData.filter(device => {
+                const matchCountry = countryFilter.value === 'all' || device.countryCode === countryFilter.value;
+                const matchVersion = versionFilter.value === 'all' || device.appVersion === versionFilter.value;
+                const matchSearch = searchDevice.value === '' || 
+                    device.deviceModel?.toLowerCase().includes(searchDevice.value.toLowerCase()) ||
+                    device.deviceBrand?.toLowerCase().includes(searchDevice.value.toLowerCase());
+                return matchCountry && matchVersion && matchSearch;
+            });
+            updateTable();
+        }
+
+        function updateStats() {
+            const totalUsers = filteredDevices.length;
+            const today = new Date().toISOString().split('T')[0];
+            const activeToday = filteredDevices.filter(d => d.lastOpenDate?.startsWith(today)).length;
+            const countries = new Set(filteredDevices.map(d => d.countryCode).filter(Boolean));
+            const totalOpens = filteredDevices.reduce((sum, d) => sum + (d.openCount || 0), 0);
 
             document.getElementById('totalUsers').textContent = totalUsers;
             document.getElementById('activeToday').textContent = activeToday;
@@ -500,28 +839,27 @@ td {
             document.getElementById('totalOpens').textContent = totalOpens;
         }
 
-        // تحديث الجدول
         function updateTable() {
             const tbody = document.getElementById('devicesTableBody');
             
-            if (devicesData.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" class="loading">لا توجد أجهزة مسجلة بعد</td></tr>';
+            if (filteredDevices.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="loading">لا توجد أجهزة مطابقة</td></tr>';
                 return;
             }
 
             let html = '';
-            devicesData.sort((a, b) => (b.openCount || 0) - (a.openCount || 0));
+            filteredDevices.sort((a, b) => (b.openCount || 0) - (a.openCount || 0));
 
-            devicesData.forEach((device, index) => {
+            filteredDevices.forEach((device, index) => {
                 const firstOpen = device.firstOpenDate ? new Date(device.firstOpenDate).toLocaleDateString('ar-EG') : '-';
                 const lastOpen = device.lastOpenDate ? new Date(device.lastOpenDate).toLocaleDateString('ar-EG') : '-';
                 
                 html += `
                     <tr>
                         <td>${index + 1}</td>
-                        <td>${device.deviceBrand || '-'} ${device.deviceModel || ''}</td>
+                        <td>${device.deviceBrand || '-'}</td>
                         <td>${device.deviceModel || '-'}</td>
-                        <td>${device.countryCode || '-'}</td>
+                        <td><span class="badge">${device.countryCode || '-'}</span></td>
                         <td>${firstOpen}</td>
                         <td>${lastOpen}</td>
                         <td><span class="badge">${device.openCount || 0}</span></td>
@@ -533,21 +871,18 @@ td {
             tbody.innerHTML = html;
         }
 
-        // تحديث الدول
         function updateCountries() {
             const countriesMap = new Map();
-            
-            devicesData.forEach(device => {
+            filteredDevices.forEach(device => {
                 if (device.countryCode) {
-                    const count = countriesMap.get(device.countryCode) || 0;
-                    countriesMap.set(device.countryCode, count + 1);
+                    countriesMap.set(device.countryCode, (countriesMap.get(device.countryCode) || 0) + 1);
                 }
             });
 
             const grid = document.getElementById('countriesGrid');
             
             if (countriesMap.size === 0) {
-                grid.innerHTML = '<p style="color: #7f8c8d;">لا توجد بيانات دول متاحة</p>';
+                grid.innerHTML = '<p style="color: #5a6b7c;">لا توجد بيانات دول متاحة</p>';
                 return;
             }
 
@@ -559,7 +894,7 @@ td {
                     <div class="country-card">
                         <div class="country-name">${country}</div>
                         <div class="country-count">${count}</div>
-                        <div style="font-size: 0.8em; opacity: 0.8;">مستخدم</div>
+                        <div style="font-size: 0.9em; opacity: 0.9;">مستخدم</div>
                     </div>
                 `;
             });
@@ -567,12 +902,11 @@ td {
             grid.innerHTML = html;
         }
 
-        // تحديث الرسم البياني
         function updateChart() {
             const ctx = document.getElementById('usersChart').getContext('2d');
             
             const registrations = {};
-            devicesData.forEach(device => {
+            filteredDevices.forEach(device => {
                 if (device.firstOpenDate) {
                     const date = device.firstOpenDate.split('T')[0];
                     registrations[date] = (registrations[date] || 0) + 1;
@@ -588,9 +922,7 @@ td {
                 cumulative.push(sum);
             });
 
-            if (chart) {
-                chart.destroy();
-            }
+            if (chart) chart.destroy();
 
             chart = new Chart(ctx, {
                 type: 'line',
@@ -599,32 +931,44 @@ td {
                     datasets: [{
                         label: 'إجمالي المستخدمين',
                         data: cumulative,
-                        borderColor: '#667eea',
-                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderColor: '#ffd700',
+                        backgroundColor: 'rgba(255,215,0,0.1)',
                         tension: 0.4,
-                        fill: true
+                        fill: true,
+                        borderWidth: 3,
+                        pointBackgroundColor: '#ffd700',
+                        pointBorderColor: '#1a2639',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        pointHoverRadius: 8
                     }]
                 },
                 options: {
                     responsive: true,
                     plugins: {
-                        legend: { display: false }
+                        legend: { display: false },
+                        tooltip: { enabled: true }
                     },
                     scales: {
                         y: {
                             beginAtZero: true,
-                            ticks: { stepSize: 1 }
+                            ticks: { stepSize: 1 },
+                            grid: { color: 'rgba(255,215,0,0.1)' }
+                        },
+                        x: {
+                            grid: { display: false }
                         }
                     }
                 }
             });
         }
 
-        // تحديث كل 30 ثانية
+        countryFilter.addEventListener('change', applyFilters);
+        versionFilter.addEventListener('change', applyFilters);
+        searchDevice.addEventListener('input', applyFilters);
+
         setInterval(() => {
-            if (auth.currentUser) {
-                loadData();
-            }
+            if (auth.currentUser) loadData();
         }, 30000);
     </script>
 </body>
