@@ -29,7 +29,6 @@
             overflow-x: hidden;
         }
 
-        /* خلفية متحركة */
         body::before {
             content: '';
             position: absolute;
@@ -50,7 +49,6 @@
             z-index: 1;
         }
 
-        /* شاشة تسجيل الدخول الفاخرة */
         .login-container {
             max-width: 450px;
             margin: 80px auto;
@@ -181,7 +179,16 @@
             box-shadow: 0 15px 30px rgba(255,215,0,0.4);
         }
 
-        /* الهيدر الرئيسي */
+        .error-message {
+            color: #e74c3c;
+            text-align: center;
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            background: #fde8e7;
+            display: none;
+        }
+
         .header {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -259,7 +266,6 @@
             box-shadow: 0 8px 20px rgba(255,71,87,0.4);
         }
 
-        /* بطاقات الإحصائيات الفاخرة */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -328,7 +334,6 @@
             line-height: 1;
         }
 
-        /* حاوية الرسم البياني */
         .chart-container {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -349,7 +354,6 @@
             gap: 10px;
         }
 
-        /* قسم الأجهزة */
         .devices-section {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -489,7 +493,6 @@
             display: inline-block;
         }
 
-        /* قسم الدول */
         .countries-section {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -576,7 +579,6 @@
             display: none;
         }
 
-        /* شريط التقدم */
         .progress-bar {
             height: 8px;
             background: linear-gradient(90deg, #ffd700, #c5a028);
@@ -730,11 +732,13 @@
             measurementId: "G-N2CT1HLTM2"
         };
 
+        // تهيئة Firebase
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         const analytics = firebase.analytics();
         const auth = firebase.auth();
 
+        // عناصر الصفحة
         const loginContainer = document.getElementById('loginContainer');
         const mainContent = document.getElementById('mainContent');
         const loginForm = document.getElementById('loginForm');
@@ -743,13 +747,22 @@
         const countryFilter = document.getElementById('countryFilter');
         const versionFilter = document.getElementById('versionFilter');
         const searchDevice = document.getElementById('searchDevice');
+        const devicesTableBody = document.getElementById('devicesTableBody');
+        const totalUsers = document.getElementById('totalUsers');
+        const activeToday = document.getElementById('activeToday');
+        const totalCountries = document.getElementById('totalCountries');
+        const totalOpens = document.getElementById('totalOpens');
+        const countriesGrid = document.getElementById('countriesGrid');
 
+        // المتغيرات العامة
         let devicesData = [];
-        let chart = null;
         let filteredDevices = [];
+        let chart = null;
 
+        // التحقق من حالة تسجيل الدخول
         auth.onAuthStateChanged((user) => {
             if (user) {
+                console.log('✅ مستخدم:', user.email);
                 loginContainer.classList.add('hidden');
                 mainContent.classList.add('visible');
                 userEmailSpan.textContent = user.email;
@@ -761,6 +774,7 @@
             }
         });
 
+        // معالجة تسجيل الدخول
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value;
@@ -782,39 +796,49 @@
             }
         });
 
+        // تسجيل الخروج
         window.logout = async function() {
             await auth.signOut();
         };
 
+        // تحميل البيانات
         async function loadData() {
-    try {
-        console.log('📥 جاري تحميل البيانات...');
-        const snapshot = await database.ref('devices').once('value');
-        console.log('📦 البيانات الخام:', snapshot.val());
-        
-        const devices = snapshot.val();
-        
-        if (devices) {
-            devicesData = Object.values(devices);
-            console.log('✅ عدد الأجهزة:', devicesData.length);
-            console.log('📱 الأجهزة:', devicesData);
-            updateFilters();
-            applyFilters();
-            updateStats();
-            updateCountries();
-            updateChart();
-        } else {
-            console.log('⚠️ لا توجد بيانات');
-            document.getElementById('devicesTableBody').innerHTML = 
-                '<tr><td colspan="8" class="loading">لا توجد أجهزة مسجلة بعد</td></tr>';
+            try {
+                console.log('📥 جاري تحميل البيانات...');
+                const snapshot = await database.ref('devices').once('value');
+                const data = snapshot.val();
+                console.log('📦 البيانات:', data);
+                
+                if (data) {
+                    devicesData = Object.values(data);
+                    console.log('✅ عدد الأجهزة:', devicesData.length);
+                    console.log('📱 أول جهاز:', devicesData[0]);
+                    
+                    // تحديث الفلاتر
+                    updateFilters();
+                    
+                    // تطبيق الفلاتر
+                    applyFilters();
+                    
+                    // تحديث الإحصائيات
+                    updateStats();
+                    
+                    // تحديث الدول
+                    updateCountries();
+                    
+                    // تحديث الرسم البياني
+                    updateChart();
+                } else {
+                    console.log('⚠️ لا توجد بيانات');
+                    devicesTableBody.innerHTML = '<tr><td colspan="8" class="loading">لا توجد أجهزة مسجلة بعد</td></tr>';
+                }
+            } catch (error) {
+                console.error('❌ خطأ:', error);
+                devicesTableBody.innerHTML = '<tr><td colspan="8" class="loading" style="color: red;">❌ خطأ في تحميل البيانات</td></tr>';
+            }
         }
-    } catch (error) {
-        console.error('❌ خطأ في تحميل البيانات:', error);
-        document.getElementById('devicesTableBody').innerHTML = 
-            '<tr><td colspan="8" class="loading" style="color: red;">❌ خطأ: ' + error.message + '</td></tr>';
-    }
-}
 
+        // تحديث الفلاتر
         function updateFilters() {
             const countries = new Set(devicesData.map(d => d.countryCode).filter(Boolean));
             const versions = new Set(devicesData.map(d => d.appVersion).filter(Boolean));
@@ -828,6 +852,7 @@
             versionFilter.innerHTML = versionHtml;
         }
 
+        // تطبيق الفلاتر
         function applyFilters() {
             filteredDevices = devicesData.filter(device => {
                 const matchCountry = countryFilter.value === 'all' || device.countryCode === countryFilter.value;
@@ -840,24 +865,24 @@
             updateTable();
         }
 
+        // تحديث الإحصائيات
         function updateStats() {
-            const totalUsers = filteredDevices.length;
+            const total = filteredDevices.length;
             const today = new Date().toISOString().split('T')[0];
-            const activeToday = filteredDevices.filter(d => d.lastOpenDate?.startsWith(today)).length;
+            const active = filteredDevices.filter(d => d.lastOpenDate?.startsWith(today)).length;
             const countries = new Set(filteredDevices.map(d => d.countryCode).filter(Boolean));
-            const totalOpens = filteredDevices.reduce((sum, d) => sum + (d.openCount || 0), 0);
+            const opens = filteredDevices.reduce((sum, d) => sum + (d.openCount || 0), 0);
 
-            document.getElementById('totalUsers').textContent = totalUsers;
-            document.getElementById('activeToday').textContent = activeToday;
-            document.getElementById('totalCountries').textContent = countries.size;
-            document.getElementById('totalOpens').textContent = totalOpens;
+            totalUsers.textContent = total;
+            activeToday.textContent = active;
+            totalCountries.textContent = countries.size;
+            totalOpens.textContent = opens;
         }
 
+        // تحديث الجدول
         function updateTable() {
-            const tbody = document.getElementById('devicesTableBody');
-            
             if (filteredDevices.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" class="loading">لا توجد أجهزة مطابقة</td></tr>';
+                devicesTableBody.innerHTML = '<tr><td colspan="8" class="loading">لا توجد أجهزة مطابقة</td></tr>';
                 return;
             }
 
@@ -882,9 +907,10 @@
                 `;
             });
 
-            tbody.innerHTML = html;
+            devicesTableBody.innerHTML = html;
         }
 
+        // تحديث الدول
         function updateCountries() {
             const countriesMap = new Map();
             filteredDevices.forEach(device => {
@@ -893,10 +919,8 @@
                 }
             });
 
-            const grid = document.getElementById('countriesGrid');
-            
             if (countriesMap.size === 0) {
-                grid.innerHTML = '<p style="color: #5a6b7c;">لا توجد بيانات دول متاحة</p>';
+                countriesGrid.innerHTML = '<p style="color: #5a6b7c;">لا توجد بيانات دول متاحة</p>';
                 return;
             }
 
@@ -913,9 +937,10 @@
                 `;
             });
 
-            grid.innerHTML = html;
+            countriesGrid.innerHTML = html;
         }
 
+        // تحديث الرسم البياني
         function updateChart() {
             const ctx = document.getElementById('usersChart').getContext('2d');
             
@@ -977,10 +1002,12 @@
             });
         }
 
+        // مستمعو الأحداث للفلاتر
         countryFilter.addEventListener('change', applyFilters);
         versionFilter.addEventListener('change', applyFilters);
         searchDevice.addEventListener('input', applyFilters);
 
+        // تحديث كل 30 ثانية
         setInterval(() => {
             if (auth.currentUser) loadData();
         }, 30000);
