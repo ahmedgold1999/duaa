@@ -308,25 +308,29 @@
         let chart = null;
 
         // التحقق من حالة تسجيل الدخول
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                // مستخدم مسجل الدخول
-                loginContainer.classList.add('hidden');
-                mainContent.classList.add('visible');
-                userEmailSpan.textContent = user.email;
-                loadData(); // تحميل البيانات
-                
-                // تسجيل حدث في Analytics
-                analytics.logEvent({
-                    name: 'admin_login',
-                    params: { email: user.email }
-                });
-            } else {
-                // لا يوجد مستخدم - عرض شاشة تسجيل الدخول
-                loginContainer.classList.remove('hidden');
-                mainContent.classList.remove('visible');
-            }
+        // التحقق من حالة تسجيل الدخول
+auth.onAuthStateChanged((user) => {
+    console.log('👤 حالة المستخدم:', user ? 'مسجل دخول' : 'غير مسجل');
+    
+    if (user) {
+        // مستخدم مسجل الدخول
+        console.log('✅ مستخدم:', user.email);
+        loginContainer.classList.add('hidden');
+        mainContent.classList.add('visible');
+        userEmailSpan.textContent = user.email;
+        loadData();
+        
+        analytics.logEvent({
+            name: 'admin_login',
+            params: { email: user.email }
         });
+    } else {
+        // لا يوجد مستخدم
+        console.log('🔴 لا يوجد مستخدم');
+        loginContainer.classList.remove('hidden');
+        mainContent.classList.remove('visible');
+    }
+});
 
         // معالجة تسجيل الدخول
         loginForm.addEventListener('submit', async (e) => {
